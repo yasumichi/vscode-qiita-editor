@@ -25,11 +25,12 @@ export class QiitaCli {
                     windowsHide: true,
                     stdio: ["pipe", "pipe", "inherit"]
                 });
+                qiitaProcess.stdout.setEncoding('utf-8');
                 qiitaProcess.on("error", (err) => {
                     console.log(err);
                 });
                 qiitaProcess.stdout.on("data", (data) => {
-                    console.log(data);
+                    vscode.window.showInformationMessage(data);
                 });
                 clearInterval(intervalId);
             }

@@ -30,7 +30,6 @@ export async function activate(context: vscode.ExtensionContext) {
 
 	context.subscriptions.push(
 		vscode.commands.registerCommand("qiita-editor.create-new", () => {
-			vscode.window.showInformationMessage("qiita-editor.create-new called.");
 			cli.new_article();
 		})
 	);
