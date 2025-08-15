@@ -72,7 +72,7 @@ export class QiitaTreeViewProvider implements vscode.TreeDataProvider<QiitaTreeI
     }
 
     getParent?(element: QiitaTreeItem): vscode.ProviderResult<QiitaTreeItem> {
-        throw new Error('Method not implemented.');
+        return element.parent;
     }
 
     resolveTreeItem?(item: vscode.TreeItem, element: QiitaTreeItem, token: vscode.CancellationToken): vscode.ProviderResult<vscode.TreeItem> {
