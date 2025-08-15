@@ -6,10 +6,14 @@ import path from 'path';
 import * as readline from 'readline';
 import * as YAML from 'yaml';
 
-export class QiitaTreeViewProvider implements vscode.TreeDataProvider<QiitaTreeItem> {
+export class QiitaTreeViewProvider implements vscode.TreeDataProvider<QiitaTreeItem>,Disposable {
+    private _onDidChangeTreeData: vscode.EventEmitter<any> = new vscode.EventEmitter<any>();
+    readonly onDidChangeTreeData: vscode.Event<any> = this._onDidChangeTreeData.event;
+
     private rootItems: QiitaTreeItem[];
     private published: QiitaTreeItem;
     private drafts: QiitaTreeItem;
+    private watcher: vscode.FileSystemWatcher | undefined;
 
     constructor() {
         this.published = new QiitaTreeItem("Published");
@@ -59,9 +63,27 @@ export class QiitaTreeViewProvider implements vscode.TreeDataProvider<QiitaTreeI
                 });
             });
         });
+        if (vscode.workspace && vscode.workspace.workspaceFolders) {
+            this.watcher = vscode.workspace.createFileSystemWatcher(
+                new vscode.RelativePattern(vscode.workspace.workspaceFolders[0], "public/*.md")
+            );
+            this.watcher.onDidCreate((e) => {
+                const article = new QiitaTreeItem(path.basename(e.fsPath) , e.path);
+                this.drafts.addChild(article);
+                this.refresh();
+            });
+        }
     }
 
-    onDidChangeTreeData?: vscode.Event<void | QiitaTreeItem | QiitaTreeItem[] | null | undefined> | undefined;
+    public refresh() {
+        this._onDidChangeTreeData.fire(undefined);
+    }
+
+    [Symbol.dispose](): void {
+        if(this.watcher) {
+            this.watcher.dispose();
+        }
+    }
 
     getTreeItem(element: QiitaTreeItem): vscode.TreeItem | Thenable<vscode.TreeItem> {
         //const collapsibleState = element.children.length > 0 ? vscode.TreeItemCollapsibleState.Collapsed : vscode.TreeItemCollapsibleState.None;
