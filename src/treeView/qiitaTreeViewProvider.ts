@@ -21,7 +21,7 @@ export class QiitaTreeViewProvider implements vscode.TreeDataProvider<QiitaTreeI
         vscode.workspace.findFiles("public/*.md").then(files => {
             files.forEach((val, index) => {
                 const uri = val.path;
-                const fullpath = val.path.slice(1);
+                const fullpath = val.fsPath;
                 const rs = fs.createReadStream(fullpath, 'utf-8');
                 const rl = readline.createInterface(rs);
 
