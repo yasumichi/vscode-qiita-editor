@@ -68,7 +68,16 @@ export class QiitaTreeViewProvider implements vscode.TreeDataProvider<QiitaTreeI
     }
 
     getChildren(element?: QiitaTreeItem | undefined): vscode.ProviderResult<QiitaTreeItem[]> {
-        return element ? element.children : this.rootItems;
+        let children: vscode.ProviderResult<QiitaTreeItem[]>;
+
+        if (element) {
+            children = element.children;
+            children.sort((a, b) => a.updated_at.localeCompare(b.updated_at));
+        } else {
+            children = this.rootItems;
+        }
+
+        return children;
     }
 
     getParent?(element: QiitaTreeItem): vscode.ProviderResult<QiitaTreeItem> {
