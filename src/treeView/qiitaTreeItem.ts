@@ -5,7 +5,7 @@ export class QiitaTreeItem {
     private _children: QiitaTreeItem[];
     private _parent: QiitaTreeItem | undefined | null;
 
-    constructor(public name: string, public path: string = "") {
+    constructor(public name: string, public path: string = "", public updated_at: string = "") {
         this._children = [];
     }
 

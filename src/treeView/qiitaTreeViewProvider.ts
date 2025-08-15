@@ -47,7 +47,7 @@ export class QiitaTreeViewProvider implements vscode.TreeDataProvider<QiitaTreeI
                     if (complete) {
                         const result = YAML.parse(yaml);
                         if(result.id) {
-                            const article = new QiitaTreeItem(result.title, uri);
+                            const article = new QiitaTreeItem(result.title, uri, result.updated_at);
                             published.addChild(article);
                         } else {
                             const article = new QiitaTreeItem(path.basename(fullpath) , uri);
