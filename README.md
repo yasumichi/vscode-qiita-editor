@@ -10,7 +10,26 @@
 
 ## Features
 
-- 投稿コンテンツを `title` で一覧表示できます。
+- 投稿記事を `title` で一覧表示できます
+- 投稿記事を作成できます
+
+## Usage
+
+### 編集する投稿コンテンツをタイトルで選択する
+
+Explorer にある「QIITA CONTENTS」ビューで投稿コンテンツの一覧を確認できます。
+
+コンテンツをクリックするとテキストエディタが開きます。
+
+![](docs/images/PublishedList.png)
+
+### 新規記事の作成
+
+QIITA CONTENTS ビュー上の紙のアイコンをクリックするか、コマンドパレットから `Qiita Editor: Create New` を実行します。
+
+![](docs/images/DraftsList.png)
+
+新規作成されたファイルは、`Drafts` に追加され、テキストエディタが開きます。
 
 ## Requirements
 
