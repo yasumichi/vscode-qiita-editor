@@ -96,7 +96,11 @@ export class QiitaTreeViewProvider implements vscode.TreeDataProvider<QiitaTreeI
 
         if (element) {
             children = element.children;
-            children.sort((a, b) => a.updated_at.localeCompare(b.updated_at));
+            if (element.name === "published") {
+                children.sort((a, b) => a.updated_at.localeCompare(b.updated_at));
+            } else {
+                children.sort((a, b) => a.name.localeCompare(b.name));
+            }
         } else {
             children = this.rootItems;
         }
