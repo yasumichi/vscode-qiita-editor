@@ -14,7 +14,6 @@ export async function activate(context: vscode.ExtensionContext) {
 	var treeView = vscode.window.createTreeView("qiita", { treeDataProvider: qiitaTreeViewProvider });
 	treeView.onDidChangeSelection((ev) => {
 		ev.selection.forEach(async (val,index) => {
-			console.log(val.path);
 			if (val.path.length > 0) {
 				try {
 					const doc = await vscode.workspace.openTextDocument(val.path);
