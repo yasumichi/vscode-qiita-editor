@@ -8,13 +8,15 @@ import * as YAML from 'yaml';
 
 export class QiitaTreeViewProvider implements vscode.TreeDataProvider<QiitaTreeItem> {
     private rootItems: QiitaTreeItem[];
+    private published: QiitaTreeItem;
+    private drafts: QiitaTreeItem;
 
     constructor() {
-        const published = new QiitaTreeItem("Published");
-        const drafts = new QiitaTreeItem("Drafts");
+        this.published = new QiitaTreeItem("Published");
+        this.drafts = new QiitaTreeItem("Drafts");
         this.rootItems = [
-            published,
-            drafts
+            this.published,
+            this.drafts
         ];
         vscode.workspace.findFiles("public/*.md").then(files => {
             files.forEach((val, index) => {
@@ -48,10 +50,10 @@ export class QiitaTreeViewProvider implements vscode.TreeDataProvider<QiitaTreeI
                         const result = YAML.parse(yaml);
                         if(result.id) {
                             const article = new QiitaTreeItem(result.title, uri, result.updated_at);
-                            published.addChild(article);
+                            this.published.addChild(article);
                         } else {
                             const article = new QiitaTreeItem(path.basename(fullpath) , uri);
-                            drafts.addChild(article);
+                            this.drafts.addChild(article);
                         }
                     }
                 });

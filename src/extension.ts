@@ -3,16 +3,12 @@
 import * as vscode from 'vscode';
 import { QiitaTreeViewProvider } from './treeView/qiitaTreeViewProvider';
 import { QiitaTreeItem } from './treeView/qiitaTreeItem';
-
-/*
-import * as process from 'process';
-import * as childProcess from 'child_process';
-import which from 'which';
-*/
+import { QiitaCli } from './qiitacli/qiitaCli';
 
 // This method is called when your extension is activated
 // Your extension is activated the very first time the command is executed
 export async function activate(context: vscode.ExtensionContext) {
+	let cli = new QiitaCli();
 	const qiitaTreeViewProvider = new QiitaTreeViewProvider();
 	//vscode.window.registerTreeDataProvider("qiita", qiitaTreeViewProvider);
 	var treeView = vscode.window.createTreeView("qiita", { treeDataProvider: qiitaTreeViewProvider });
@@ -33,7 +29,12 @@ export async function activate(context: vscode.ExtensionContext) {
 
 	vscode.commands.executeCommand('setContext', 'qiita-editor.activated', true);
 
-	//context.subscriptions.push();
+	context.subscriptions.push(
+		vscode.commands.registerCommand("qiita-editor.create-new", () => {
+			vscode.window.showInformationMessage("qiita-editor.create-new called.");
+			cli.new_article();
+		})
+	);
 }
 
 // This method is called when your extension is deactivated

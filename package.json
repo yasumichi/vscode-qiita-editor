@@ -16,10 +16,20 @@
   "contributes": {
     "commands": [
       {
-        "command": "qiita-editor.open-tree-view-item",
-        "title": "Open Document"
+        "command": "qiita-editor.create-new",
+        "title": "Qiita Editor: Create New",
+        "icon": "$(file-text)"
       }
     ],
+    "menus": {
+      "view/title": [
+        {
+					"command": "qiita-editor.create-new",
+					"when": "qiita-editor.activated && view == qiita",
+					"group": "navigation"
+        }
+      ]
+    },
     "views": {
       "explorer": [
         {
