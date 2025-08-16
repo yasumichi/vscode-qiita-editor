@@ -24,10 +24,8 @@ export class QiitaTreeItem {
     }
 
     removeChild(child: QiitaTreeItem) {
-        const childIndex = this._children.indexOf(child);
-        if (childIndex >= 0) {
-            this._children.splice(childIndex, 1);
-            child._parent = null;
-        }
+        this._children = this.children.filter((value, index) => {
+            return value !== child;
+        });
     }
 }
