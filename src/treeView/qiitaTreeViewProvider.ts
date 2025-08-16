@@ -52,18 +52,18 @@ export class QiitaTreeViewProvider implements vscode.TreeDataProvider<QiitaTreeI
         }
     }
 
-    private onDidDeleteFile(uri: vscode.Uri) {
+    private async onDidDeleteFile(uri: vscode.Uri) {
+        const foundTab = vscode.window.tabGroups.all[0].tabs.filter(tab => (tab.input instanceof vscode.TabInputText) && (tab.input.uri.path === uri.path)
+        );
+
+        if (foundTab.length === 1) {
+            await vscode.window.tabGroups.close(foundTab, false);
+        }
         [this.published, this.drafts].forEach((parent, index) => {
             parent.children.filter((value, index) => {
                 return value.path === uri.path;
             }).forEach(async (value, index) => {
                 parent.removeChild(value);
-                const foundTab = vscode.window.tabGroups.all[0].tabs.filter(tab => (tab.input instanceof vscode.TabInputText) && (tab.input.uri.path === uri.path)
-                );
-
-                if (foundTab.length === 1) {
-                    await vscode.window.tabGroups.close(foundTab, false);
-                }
             });
         });
         this.refresh();
