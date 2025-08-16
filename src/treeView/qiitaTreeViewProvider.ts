@@ -22,6 +22,11 @@ export class QiitaTreeViewProvider implements vscode.TreeDataProvider<QiitaTreeI
             this.published,
             this.drafts
         ];
+        this.findArticles();
+        this.watchFiles();
+    }
+
+    private findArticles() {
         vscode.workspace.findFiles("public/*.md").then(files => {
             files.forEach((val, index) => {
                 const uri = val.path;
@@ -52,18 +57,17 @@ export class QiitaTreeViewProvider implements vscode.TreeDataProvider<QiitaTreeI
                     rs.close();
                     if (complete) {
                         const result = YAML.parse(yaml);
-                        if(result.id) {
+                        if (result.id) {
                             const article = new QiitaTreeItem(result.title, uri, result.updated_at);
                             this.published.addChild(article);
                         } else {
-                            const article = new QiitaTreeItem(path.basename(fullpath) , uri);
+                            const article = new QiitaTreeItem(path.basename(fullpath), uri);
                             this.drafts.addChild(article);
                         }
                     }
                 });
             });
         });
-        this.watchFiles();
     }
 
     private watchFiles() {
