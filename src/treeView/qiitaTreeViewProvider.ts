@@ -35,7 +35,7 @@ export class QiitaTreeViewProvider implements vscode.TreeDataProvider<QiitaTreeI
                         const article = new QiitaTreeItem(json.title, uri.path, json.updated_at);
                         this.published.addChild(article);
                     } else {
-                        const article = new QiitaTreeItem(path.basename(uri.fsPath), uri.path);
+                        const article = new QiitaTreeItem(json.title, uri.path);
                         this.drafts.addChild(article);
                     }
                 });
@@ -49,26 +49,65 @@ export class QiitaTreeViewProvider implements vscode.TreeDataProvider<QiitaTreeI
                 new vscode.RelativePattern(vscode.workspace.workspaceFolders[0], "public/*.md")
             );
             this.watcher.onDidCreate(async (e) => {
-                const article = new QiitaTreeItem(path.basename(e.fsPath), e.path);
-                this.drafts.addChild(article);
-                this.refresh();
-                const doc = await vscode.workspace.openTextDocument(e.path);
-                await vscode.window.showTextDocument(doc, vscode.ViewColumn.One, true);
-            });
-            this.watcher.onDidDelete((e) => {
                 const filename = path.basename(e.fsPath);
-                let parent: QiitaTreeItem | undefined;
-                if (filename.startsWith("new")) {
-                    parent = this.drafts;
-                } else {
-                    parent = this.published;
-                }
-                parent.children.filter((value, index) => {
-                    return value.path === e.path;
-                }).forEach((value,index) => {
-                    parent.children.splice(index, 1);
+                FrontMatterParser.parse(e).then(async (json) => {
+                    let parent: QiitaTreeItem | undefined;
+                    if (json.id) {
+                        parent = this.published;
+                    } else {
+                        parent = this.drafts;
+                    }
+                    const article = new QiitaTreeItem(json.title, e.path);
+                    parent.addChild(article);
+                    if (parent === this.published) {
+                        parent.children.sort((a, b) => a.updated_at.localeCompare(b.updated_at));
+                    } else {
+                        parent.children.sort((a, b) => a.name.localeCompare(b.name));
+                    }
+                    this.refresh();
+                    const doc = await vscode.workspace.openTextDocument(e.path);
+                    await vscode.window.showTextDocument(doc, vscode.ViewColumn.One, true);
+                });
+            });
+            this.watcher.onDidChange((e) => {
+                const filename = path.basename(e.fsPath);
+                FrontMatterParser.parse(e).then((json) => {
+                    if (filename.startsWith("new")) {
+                        this.drafts.children.filter((value,index) => {
+                            return value.path === e.path;
+                        }).forEach((value,index) => {
+                            value.name = json.title;
+                            if (json.id) {
+                                const newname = path.join(path.dirname(e.fsPath), json.id + ".md");
+                                fs.renameSync(e.fsPath, newname);
+                            }
+                        });
+                    } else {
+                        this.published.children.filter((value,index) => {
+                            return value.path === e.path;
+                        }).forEach((value,index) => {
+                            value.name = json.title;
+                        });
+                    }
                     this.refresh();
                 });
+            });
+            this.watcher.onDidDelete((e) => {
+                [this.published, this.drafts].forEach((parent, index) => {
+                    parent.children.filter((value, index) => {
+                        return value.path === e.path;
+                    }).forEach(async (value, index) => {
+                        parent.children.splice(index, 1);
+                        const foundTab = vscode.window.tabGroups.all[0].tabs.filter(tab =>
+                            (tab.input instanceof vscode.TabInputText) && (tab.input.uri.path === e.path)
+                        );
+
+                        if (foundTab.length === 1) {
+                            await vscode.window.tabGroups.close(foundTab, false);
+                        }
+                    });
+                });
+                this.refresh();
             });
         }
     }
