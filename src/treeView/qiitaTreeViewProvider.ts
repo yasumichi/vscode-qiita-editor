@@ -46,16 +46,16 @@ export class QiitaTreeViewProvider implements vscode.TreeDataProvider<QiitaTreeI
             this.watcher = vscode.workspace.createFileSystemWatcher(
                 new vscode.RelativePattern(vscode.workspace.workspaceFolders[0], "public/*.md")
             );
-            this.watcher.onDidCreate(async (e) => {
-                const filename = path.basename(e.fsPath);
-                FrontMatterParser.parse(e).then(async (json) => {
+            this.watcher.onDidCreate(async (uri) => {
+                const filename = path.basename(uri.fsPath);
+                FrontMatterParser.parse(uri).then(async (json) => {
                     let parent: QiitaTreeItem | undefined;
                     if (json.id) {
                         parent = this.published;
                     } else {
                         parent = this.drafts;
                     }
-                    const article = new QiitaTreeItem(json.title, e.path);
+                    const article = new QiitaTreeItem(json.title, uri.path);
                     parent.addChild(article);
                     if (parent === this.published) {
                         parent.children.sort((a, b) => a.updated_at.localeCompare(b.updated_at));
@@ -63,26 +63,26 @@ export class QiitaTreeViewProvider implements vscode.TreeDataProvider<QiitaTreeI
                         parent.children.sort((a, b) => a.name.localeCompare(b.name));
                     }
                     this.refresh();
-                    const doc = await vscode.workspace.openTextDocument(e.path);
+                    const doc = await vscode.workspace.openTextDocument(uri.path);
                     await vscode.window.showTextDocument(doc, vscode.ViewColumn.One, true);
                 });
             });
-            this.watcher.onDidChange((e) => {
-                const filename = path.basename(e.fsPath);
-                FrontMatterParser.parse(e).then((json) => {
+            this.watcher.onDidChange((uri) => {
+                const filename = path.basename(uri.fsPath);
+                FrontMatterParser.parse(uri).then((json) => {
                     if (filename.startsWith("new")) {
                         this.drafts.children.filter((value,index) => {
-                            return value.path === e.path;
+                            return value.path === uri.path;
                         }).forEach((value,index) => {
                             value.name = json.title;
                             if (json.id) {
-                                const newname = path.join(path.dirname(e.fsPath), json.id + ".md");
-                                fs.renameSync(e.fsPath, newname);
+                                const newname = path.join(path.dirname(uri.fsPath), json.id + ".md");
+                                fs.renameSync(uri.fsPath, newname);
                             }
                         });
                     } else {
                         this.published.children.filter((value,index) => {
-                            return value.path === e.path;
+                            return value.path === uri.path;
                         }).forEach((value,index) => {
                             value.name = json.title;
                         });
@@ -90,14 +90,14 @@ export class QiitaTreeViewProvider implements vscode.TreeDataProvider<QiitaTreeI
                     this.refresh();
                 });
             });
-            this.watcher.onDidDelete((e) => {
+            this.watcher.onDidDelete((uri) => {
                 [this.published, this.drafts].forEach((parent, index) => {
                     parent.children.filter((value, index) => {
-                        return value.path === e.path;
+                        return value.path === uri.path;
                     }).forEach(async (value, index) => {
                         parent.children.splice(index, 1);
                         const foundTab = vscode.window.tabGroups.all[0].tabs.filter(tab =>
-                            (tab.input instanceof vscode.TabInputText) && (tab.input.uri.path === e.path)
+                            (tab.input instanceof vscode.TabInputText) && (tab.input.uri.path === uri.path)
                         );
 
                         if (foundTab.length === 1) {
