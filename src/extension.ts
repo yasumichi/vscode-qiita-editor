@@ -35,6 +35,9 @@ export async function activate(context: vscode.ExtensionContext) {
 		vscode.commands.registerCommand("qiita-editor.publish", () => {
 			cli.publish();
 		}),
+		vscode.commands.registerCommand("qiita-editor.open-file-uploader", () => {
+			vscode.env.openExternal(vscode.Uri.parse('https://qiita.com/settings/uploading_images'));
+		}),
 		vscode.window.onDidChangeActiveTextEditor((editor) => onDidChangeActiveTextEditor(editor))
 	);
 	onDidChangeActiveTextEditor(vscode.window.activeTextEditor);

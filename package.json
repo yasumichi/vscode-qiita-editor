@@ -28,7 +28,12 @@
       {
         "command": "qiita-editor.publish",
         "title": "Qiita Editor: Publish",
-          "icon": "$(broadcast)"
+        "icon": "$(broadcast)"
+      },
+      {
+        "command": "qiita-editor.open-file-uploader",
+        "title": "Qiita Editor: Open File Uploader",
+        "icon": "$(cloud-upload)"
       }
     ],
     "menus": {
@@ -42,6 +47,11 @@
       "view/title": [
         {
 					"command": "qiita-editor.create-new",
+					"when": "qiita-editor.activated && view == qiita",
+					"group": "navigation"
+        },
+        {
+          "command": "qiita-editor.open-file-uploader",
 					"when": "qiita-editor.activated && view == qiita",
 					"group": "navigation"
         }
