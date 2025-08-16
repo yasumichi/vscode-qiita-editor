@@ -5,6 +5,7 @@ import fs, { read } from 'fs';
 import path from 'path';
 import * as readline from 'readline';
 import * as YAML from 'yaml';
+import { FrontMatterParser } from './frontMatterParser';
 
 export class QiitaTreeViewProvider implements vscode.TreeDataProvider<QiitaTreeItem>,Disposable {
     private _onDidChangeTreeData: vscode.EventEmitter<any> = new vscode.EventEmitter<any>();
@@ -28,42 +29,14 @@ export class QiitaTreeViewProvider implements vscode.TreeDataProvider<QiitaTreeI
 
     private findArticles() {
         vscode.workspace.findFiles("public/*.md").then(files => {
-            files.forEach((val, index) => {
-                const uri = val.path;
-                const fullpath = val.fsPath;
-                const rs = fs.createReadStream(fullpath, 'utf-8');
-                const rl = readline.createInterface(rs);
-
-                var yaml: string = "";
-                var onMeta = false;
-                var complete = false;
-
-                rl.on('line', (line) => {
-                    if (line.match(/^---$/)) {
-                        if (onMeta) {
-                            complete = true;
-                            onMeta = false;
-                            rl.close();
-                        } else {
-                            onMeta = true;
-                        }
+            files.forEach((uri, index) => {
+                FrontMatterParser.parse(uri).then((json) => {
+                    if (json.id) {
+                        const article = new QiitaTreeItem(json.title, uri.path, json.updated_at);
+                        this.published.addChild(article);
                     } else {
-                        if (onMeta) {
-                            yaml = yaml + line + "\n";
-                        }
-                    }
-                });
-                rl.on('close', () => {
-                    rs.close();
-                    if (complete) {
-                        const result = YAML.parse(yaml);
-                        if (result.id) {
-                            const article = new QiitaTreeItem(result.title, uri, result.updated_at);
-                            this.published.addChild(article);
-                        } else {
-                            const article = new QiitaTreeItem(path.basename(fullpath), uri);
-                            this.drafts.addChild(article);
-                        }
+                        const article = new QiitaTreeItem(path.basename(uri.fsPath), uri.path);
+                        this.drafts.addChild(article);
                     }
                 });
             });
