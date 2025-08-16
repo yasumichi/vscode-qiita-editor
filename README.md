@@ -4,14 +4,17 @@
 
 [VS Code Zenn Editor](https://marketplace.visualstudio.com/items?itemName=negokaz.zenn-editor) を参考に開発しています。
 
-開発の取っ掛かりについて、以下に記事を書きました。
+開発について、以下に記事を書きました。
 
 - [qiita-cli を VSCode に統合する拡張機能が欲しい #Markdown - Qiita](https://qiita.com/yasumichi/items/dffcff0287e8efc11a3d)
+- [VS Code Qiita Editor から npx qiita new を呼び出しテキストエディタで開くまで #TypeScript - Qiita](https://qiita.com/yasumichi/items/163a9f2c451ad6fcb9c8)
+- [VS Code Qiita Editor から npx qiita publish を呼び出すテスト #VSCode - Qiita](https://qiita.com/yasumichi/items/89a1d1b39c365ff0e9fd)
 
 ## Features
 
 - 投稿記事を `title` で一覧表示できます
 - 投稿記事を作成できます
+- 編集中の記事を Qiita に投稿・更新できます
 
 ## Usage
 
@@ -30,6 +33,14 @@ QIITA CONTENTS ビュー上の紙のアイコンをクリックするか、コ�
 ![](docs/images/DraftsList.png)
 
 新規作成されたファイルは、`Drafts` に追加され、テキストエディタが開きます。
+
+### 編集中の記事を投稿
+
+public フォルダにあるマークダウンをテキストエディタで開くとタイトルバーにアンテナから電波が出ている `broadcast` アイコンが表示されます。
+
+![](docs/images/QiitaPublish.png)
+
+`broadcast` アイコンをクリックすると編集中の記事を Qiita に投稿・更新できます。
 
 ## Requirements
 
