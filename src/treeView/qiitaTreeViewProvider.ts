@@ -82,6 +82,21 @@ export class QiitaTreeViewProvider implements vscode.TreeDataProvider<QiitaTreeI
                 const doc = await vscode.workspace.openTextDocument(e.path);
                 await vscode.window.showTextDocument(doc, vscode.ViewColumn.One, true);
             });
+            this.watcher.onDidDelete((e) => {
+                const filename = path.basename(e.fsPath);
+                let parent: QiitaTreeItem | undefined;
+                if (filename.startsWith("new")) {
+                    parent = this.drafts;
+                } else {
+                    parent = this.published;
+                }
+                parent.children.filter((value, index) => {
+                    return value.path === e.path;
+                }).forEach((value,index) => {
+                    parent.children.splice(index, 1);
+                    this.refresh();
+                });
+            });
         }
     }
 
