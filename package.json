@@ -24,9 +24,21 @@
         "command": "qiita-editor.create-new",
         "title": "Qiita Editor: Create New",
         "icon": "$(file-text)"
+      },
+      {
+        "command": "qiita-editor.publish",
+        "title": "Qiita Editor: Publish",
+          "icon": "$(broadcast)"
       }
     ],
     "menus": {
+      "editor/title": [
+        {
+          "command": "qiita-editor.publish",
+          "when": "qiita-editor.activated && qiita-editor.publishable",
+					"group": "navigation"
+        }
+      ],
       "view/title": [
         {
 					"command": "qiita-editor.create-new",

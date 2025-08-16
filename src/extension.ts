@@ -31,9 +31,27 @@ export async function activate(context: vscode.ExtensionContext) {
 	context.subscriptions.push(
 		vscode.commands.registerCommand("qiita-editor.create-new", () => {
 			cli.new_article();
-		})
+		}),
+		vscode.commands.registerCommand("qiita-editor.publish", () => {
+			cli.publish();
+		}),
+		vscode.window.onDidChangeActiveTextEditor((editor) => onDidChangeActiveTextEditor(editor))
 	);
+	onDidChangeActiveTextEditor(vscode.window.activeTextEditor);
 }
 
 // This method is called when your extension is deactivated
 export function deactivate() { }
+
+function onDidChangeActiveTextEditor(editor: vscode.TextEditor | undefined): any {
+	if (editor && vscode.workspace.workspaceFolders) {
+		const uri = editor.document.uri;
+		const regexp = /.*\/public\/.*\.md$/;
+		if (regexp.test(uri.path)) {
+			vscode.commands.executeCommand('setContext', 'qiita-editor.publishable', true);
+		} else {
+			vscode.commands.executeCommand('setContext', 'qiita-editor.publishable', false);
+		}
+	}
+}
+

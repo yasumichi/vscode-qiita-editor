@@ -2,7 +2,7 @@ import * as vscode from "vscode";
 import * as childProcess from "child_process";
 import which from "which";
 import * as process from "process";
-import path from "path";
+import path, { basename } from "path";
 
 export class QiitaCli {
     private npxPath: string = "";
@@ -35,5 +35,29 @@ export class QiitaCli {
                 clearInterval(intervalId);
             }
         }, 1000);
+    }
+
+    public publish() {
+        if (vscode.window.activeTextEditor && vscode.workspace.workspaceFolders) {
+            vscode.window.activeTextEditor.document.save();
+            const filebase = basename(vscode.window.activeTextEditor.document.uri.fsPath, ".md");
+            const qiitaProcess = childProcess.spawn(this.npxPath, ["qiita", "publish", filebase], {
+                cwd: vscode.workspace.workspaceFolders[0].uri.fsPath,
+                shell: process.platform === 'win32',
+                windowsHide: true,
+                stdio: ["pipe", "pipe", "pipe"]
+            });
+            qiitaProcess.stdout.setEncoding('utf-8');
+            qiitaProcess.stderr.setEncoding('utf-8');
+            qiitaProcess.on("error", (err) => {
+                vscode.window.showErrorMessage(err.message);
+            });
+            qiitaProcess.stdout.on("data", (data) => {
+                vscode.window.showInformationMessage(data);
+            });
+            qiitaProcess.stderr.on("data", (data) => {
+                vscode.window.showErrorMessage(data);
+            });
+        }
     }
 }
