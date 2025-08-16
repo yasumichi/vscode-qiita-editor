@@ -63,16 +63,20 @@ export class QiitaTreeViewProvider implements vscode.TreeDataProvider<QiitaTreeI
                 });
             });
         });
+        this.watchFiles();
+    }
+
+    private watchFiles() {
         if (vscode.workspace && vscode.workspace.workspaceFolders) {
             this.watcher = vscode.workspace.createFileSystemWatcher(
                 new vscode.RelativePattern(vscode.workspace.workspaceFolders[0], "public/*.md")
             );
             this.watcher.onDidCreate(async (e) => {
-                const article = new QiitaTreeItem(path.basename(e.fsPath) , e.path);
+                const article = new QiitaTreeItem(path.basename(e.fsPath), e.path);
                 this.drafts.addChild(article);
                 this.refresh();
                 const doc = await vscode.workspace.openTextDocument(e.path);
-                await vscode.window.showTextDocument(doc, vscode.ViewColumn.One, true); 
+                await vscode.window.showTextDocument(doc, vscode.ViewColumn.One, true);
             });
         }
     }
