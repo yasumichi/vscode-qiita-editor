@@ -2,13 +2,14 @@
   "name": "vscode-qiita-editor",
   "displayName": "vscode-qiita-editor",
   "description": "qiita cli wrapper",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "engines": {
     "vscode": "^1.102.0"
   },
   "categories": [
     "Other"
   ],
+  "icon": "docs/images/vqe.png",
   "activationEvents": [
     "workspaceContains:/qiita.config.json"
   ],
@@ -35,7 +36,8 @@
         {
           "id": "qiita",
           "name": "Qiita Contents",
-          "when": "qiita-editor.activated"
+          "when": "qiita-editor.activated",
+          "icon": "media/icon/vqe.svg"
         }
       ]
     }
