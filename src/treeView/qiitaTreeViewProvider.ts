@@ -47,29 +47,7 @@ export class QiitaTreeViewProvider implements vscode.TreeDataProvider<QiitaTreeI
                 new vscode.RelativePattern(vscode.workspace.workspaceFolders[0], "public/*.md")
             );
             this.watcher.onDidCreate(uri => this.onDidCreateFile(uri) );
-            this.watcher.onDidChange((uri) => {
-                const filename = path.basename(uri.fsPath);
-                FrontMatterParser.parse(uri).then((json) => {
-                    if (filename.startsWith("new")) {
-                        this.drafts.children.filter((value,index) => {
-                            return value.path === uri.path;
-                        }).forEach((value,index) => {
-                            value.name = json.title;
-                            if (json.id) {
-                                const newname = path.join(path.dirname(uri.fsPath), json.id + ".md");
-                                fs.renameSync(uri.fsPath, newname);
-                            }
-                        });
-                    } else {
-                        this.published.children.filter((value,index) => {
-                            return value.path === uri.path;
-                        }).forEach((value,index) => {
-                            value.name = json.title;
-                        });
-                    }
-                    this.refresh();
-                });
-            });
+            this.watcher.onDidChange(uri => this.onDidChangeFile(uri) );
             this.watcher.onDidDelete((uri) => {
                 [this.published, this.drafts].forEach((parent, index) => {
                     parent.children.filter((value, index) => {
@@ -88,6 +66,30 @@ export class QiitaTreeViewProvider implements vscode.TreeDataProvider<QiitaTreeI
                 this.refresh();
             });
         }
+    }
+
+    private onDidChangeFile(uri: vscode.Uri) {
+        const filename = path.basename(uri.fsPath);
+        FrontMatterParser.parse(uri).then((json) => {
+            if (filename.startsWith("new")) {
+                this.drafts.children.filter((value, index) => {
+                    return value.path === uri.path;
+                }).forEach((value, index) => {
+                    value.name = json.title;
+                    if (json.id) {
+                        const newname = path.join(path.dirname(uri.fsPath), json.id + ".md");
+                        fs.renameSync(uri.fsPath, newname);
+                    }
+                });
+            } else {
+                this.published.children.filter((value, index) => {
+                    return value.path === uri.path;
+                }).forEach((value, index) => {
+                    value.name = json.title;
+                });
+            }
+            this.refresh();
+        });
     }
 
     private onDidCreateFile(uri: vscode.Uri) {
