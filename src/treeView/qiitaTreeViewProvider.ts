@@ -102,7 +102,7 @@ export class QiitaTreeViewProvider implements vscode.TreeDataProvider<QiitaTreeI
             } else {
                 parent = this.drafts;
             }
-            const article = new QiitaTreeItem(json.title, uri.path);
+            const article = new QiitaTreeItem(json.title, uri.path, json.updated_at);
             parent.addChild(article);
             if (parent === this.published) {
                 parent.children.sort((a, b) => a.updated_at.localeCompare(b.updated_at));
