@@ -15,6 +15,7 @@
 - 投稿記事を `title` で一覧表示できます
 - 投稿記事を作成できます
 - 編集中の記事を Qiita に投稿・更新できます
+- ファイルアップロードのページを外部ブラウザで開けます
 
 ## Usage
 
@@ -41,6 +42,18 @@ public フォルダにあるマークダウンをテキストエディタで開�
 ![](docs/images/QiitaPublish.png)
 
 `broadcast` アイコンをクリックすると編集中の記事を Qiita に投稿・更新できます。
+
+### ファイルアップロードのページを外部ブラウザで開く
+
+QIITA CONTENTS ビュー上の `cloud-upload` アイコンをクリックします。
+
+![](docs/images/PublishedList.png)
+
+信頼されているドメインとして構成されていない場合は、下図のダイアログが開きますので `開く` をクリックします。
+
+![](docs/images/vscode-confirm-dialog.png)
+
+外部ブラウザで[ファイルのアップロード - Qiita](https://qiita.com/settings/uploading_images)が開かれます。
 
 ## Requirements
 
