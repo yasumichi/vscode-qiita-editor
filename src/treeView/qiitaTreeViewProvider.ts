@@ -57,7 +57,7 @@ export class QiitaTreeViewProvider implements vscode.TreeDataProvider<QiitaTreeI
             parent.children.filter((value, index) => {
                 return value.path === uri.path;
             }).forEach(async (value, index) => {
-                parent.children.splice(index, 1);
+                parent.removeChild(value);
                 const foundTab = vscode.window.tabGroups.all[0].tabs.filter(tab => (tab.input instanceof vscode.TabInputText) && (tab.input.uri.path === uri.path)
                 );
 
