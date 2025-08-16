@@ -10,6 +10,10 @@
     "Other"
   ],
   "icon": "docs/images/vqe.png",
+  "repository": {
+		"type": "git",
+		"url": "https://github.com/yasumichi/vscode-qiita-editor.git"
+	},
   "activationEvents": [
     "workspaceContains:/qiita.config.json"
   ],
