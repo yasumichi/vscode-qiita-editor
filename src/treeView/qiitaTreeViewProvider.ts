@@ -48,24 +48,25 @@ export class QiitaTreeViewProvider implements vscode.TreeDataProvider<QiitaTreeI
             );
             this.watcher.onDidCreate(uri => this.onDidCreateFile(uri) );
             this.watcher.onDidChange(uri => this.onDidChangeFile(uri) );
-            this.watcher.onDidDelete((uri) => {
-                [this.published, this.drafts].forEach((parent, index) => {
-                    parent.children.filter((value, index) => {
-                        return value.path === uri.path;
-                    }).forEach(async (value, index) => {
-                        parent.children.splice(index, 1);
-                        const foundTab = vscode.window.tabGroups.all[0].tabs.filter(tab =>
-                            (tab.input instanceof vscode.TabInputText) && (tab.input.uri.path === uri.path)
-                        );
-
-                        if (foundTab.length === 1) {
-                            await vscode.window.tabGroups.close(foundTab, false);
-                        }
-                    });
-                });
-                this.refresh();
-            });
+            this.watcher.onDidDelete(uri => this.onDidDeleteFile(uri) );
         }
+    }
+
+    private onDidDeleteFile(uri: vscode.Uri) {
+        [this.published, this.drafts].forEach((parent, index) => {
+            parent.children.filter((value, index) => {
+                return value.path === uri.path;
+            }).forEach(async (value, index) => {
+                parent.children.splice(index, 1);
+                const foundTab = vscode.window.tabGroups.all[0].tabs.filter(tab => (tab.input instanceof vscode.TabInputText) && (tab.input.uri.path === uri.path)
+                );
+
+                if (foundTab.length === 1) {
+                    await vscode.window.tabGroups.close(foundTab, false);
+                }
+            });
+        });
+        this.refresh();
     }
 
     private onDidChangeFile(uri: vscode.Uri) {
