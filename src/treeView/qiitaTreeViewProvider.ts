@@ -46,27 +46,7 @@ export class QiitaTreeViewProvider implements vscode.TreeDataProvider<QiitaTreeI
             this.watcher = vscode.workspace.createFileSystemWatcher(
                 new vscode.RelativePattern(vscode.workspace.workspaceFolders[0], "public/*.md")
             );
-            this.watcher.onDidCreate(async (uri) => {
-                const filename = path.basename(uri.fsPath);
-                FrontMatterParser.parse(uri).then(async (json) => {
-                    let parent: QiitaTreeItem | undefined;
-                    if (json.id) {
-                        parent = this.published;
-                    } else {
-                        parent = this.drafts;
-                    }
-                    const article = new QiitaTreeItem(json.title, uri.path);
-                    parent.addChild(article);
-                    if (parent === this.published) {
-                        parent.children.sort((a, b) => a.updated_at.localeCompare(b.updated_at));
-                    } else {
-                        parent.children.sort((a, b) => a.name.localeCompare(b.name));
-                    }
-                    this.refresh();
-                    const doc = await vscode.workspace.openTextDocument(uri.path);
-                    await vscode.window.showTextDocument(doc, vscode.ViewColumn.One, true);
-                });
-            });
+            this.watcher.onDidCreate(uri => this.onDidCreateFile(uri) );
             this.watcher.onDidChange((uri) => {
                 const filename = path.basename(uri.fsPath);
                 FrontMatterParser.parse(uri).then((json) => {
@@ -108,6 +88,28 @@ export class QiitaTreeViewProvider implements vscode.TreeDataProvider<QiitaTreeI
                 this.refresh();
             });
         }
+    }
+
+    private onDidCreateFile(uri: vscode.Uri) {
+        const filename = path.basename(uri.fsPath);
+        FrontMatterParser.parse(uri).then(async (json) => {
+            let parent: QiitaTreeItem | undefined;
+            if (json.id) {
+                parent = this.published;
+            } else {
+                parent = this.drafts;
+            }
+            const article = new QiitaTreeItem(json.title, uri.path);
+            parent.addChild(article);
+            if (parent === this.published) {
+                parent.children.sort((a, b) => a.updated_at.localeCompare(b.updated_at));
+            } else {
+                parent.children.sort((a, b) => a.name.localeCompare(b.name));
+            }
+            this.refresh();
+            const doc = await vscode.workspace.openTextDocument(uri.path);
+            await vscode.window.showTextDocument(doc, vscode.ViewColumn.One, true);
+        });
     }
 
     public refresh() {
