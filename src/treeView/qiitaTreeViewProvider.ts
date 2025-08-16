@@ -1,10 +1,8 @@
 // refer to https://qiita.com/Teach/items/3622e159782f2baecaf1
 import * as vscode from 'vscode';
 import { QiitaTreeItem } from './qiitaTreeItem';
-import fs, { read } from 'fs';
+import fs from 'fs';
 import path from 'path';
-import * as readline from 'readline';
-import * as YAML from 'yaml';
 import { FrontMatterParser } from './frontMatterParser';
 
 export class QiitaTreeViewProvider implements vscode.TreeDataProvider<QiitaTreeItem>,Disposable {
